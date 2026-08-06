@@ -49,10 +49,13 @@ class Parser:
         players = []
         for player in data:
             player_object = Player(player_full_nick=player.name, duration=player.duration)
-            bat, formatted_nick = self.find_bat_for_players(player_object)
-            player_object.bat = bat
-            player_object.name = formatted_nick
-            players.append(player_object)
+            try:
+                bat, formatted_nick = self.find_bat_for_players(player_object)
+                player_object.bat = bat
+                player_object.name = formatted_nick
+                players.append(player_object)
+            except Exception as e:
+                print(f"Error occurred while processing player {player.name}, skipping: {e}")
         return players
     
     # -----------------------------------------------------------------------------
