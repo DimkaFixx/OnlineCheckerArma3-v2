@@ -112,7 +112,7 @@ class GoogleTableManager:
         nicks = [row[0].strip() for row in users if row and row[0].strip()][:100]
         server1_data = get_online_last_30_days_s1(nicks)
         server2_data = get_online_last_30_days_s2(nicks)
-        dates = list(server1_data)
+        dates = list(reversed(server1_data))
 
         def format_duration(duration):
             hours, remainder = divmod(duration or 0, 3600)
