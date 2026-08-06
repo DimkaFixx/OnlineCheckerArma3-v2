@@ -15,7 +15,7 @@ if not DB_URL:
 
 
 MSK_TZ = timezone(timedelta(hours=3))
-engine = create_engine(DB_URL, echo=True)
+engine = create_engine(DB_URL, echo=False)
 Base = declarative_base()
 
 
