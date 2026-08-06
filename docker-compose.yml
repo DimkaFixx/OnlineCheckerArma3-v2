@@ -1,0 +1,15 @@
+services:
+  app:
+    build:
+      context: .
+      network: host
+      args:
+        HTTP_PROXY: ${HTTP_PROXY:-}
+        HTTPS_PROXY: ${HTTPS_PROXY:-}
+        http_proxy: ${http_proxy:-}
+        https_proxy: ${https_proxy:-}
+    network_mode: host
+    command: ["python", "-u", "app.py"]
+    restart: unless-stopped
+    volumes:
+      - .:/app
