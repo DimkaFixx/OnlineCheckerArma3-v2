@@ -75,7 +75,7 @@ class GoogleTableManager:
         return jedi_prefixes
 
     def update_daily_data(self):
-        """Заполнить J2:L101 последним онлайном игроков из C1:C100."""
+        """Заполнить J:M последним онлайном игроков из C1:C100."""
         users = self.get_data_of_users()
         nicks = [row[0].strip() for row in users if row and row[0].strip()]
         server1_data = check_last_online_of_the_players_s1(nicks)
@@ -91,19 +91,21 @@ class GoogleTableManager:
             minutes = remainder // 60
             return f"{player_data['days_ago']} ({hours}:{minutes:02d})"
 
-        rows = [
+        nickname_rows = [[f"`{nickname}`"] for nickname in nicks[:100]]
+        duration_rows = [
             [
-                f"`{nickname}`",
                 format_last_online(server1_data, nickname),
                 format_last_online(server2_data, nickname),
             ]
             for nickname in nicks[:100]
         ]
-        rows.extend([["", "", ""]] * (100 - len(rows)))
-        self.sheet.update("J2:L101", rows)
+        nickname_rows.extend([[""]] * (100 - len(nickname_rows)))
+        duration_rows.extend([["", ""]] * (100 - len(duration_rows)))
+        self.sheet.update("J2:J101", nickname_rows)
+        self.sheet.update("L2:M101", duration_rows)
 
     def update_mounthly_data(self):
-        """Заполнить 30-дневный отчёт: ники в M, данные S1/S2 — с O.
+        """Заполнить 30-дневный отчёт: ники в N, данные S1/S2 — с P.
 
         Для каждой даты создаётся пара столбцов: первый хранит онлайн S1,
         второй — онлайн S2.
@@ -134,7 +136,7 @@ class GoogleTableManager:
 
         nickname_rows.extend([[""]] * (100 - len(nickname_rows)))
         duration_rows.extend([[""] * 60] * (100 - len(duration_rows)))
-        self.sheet.update("M2:M101", nickname_rows)
-        self.sheet.update("O1:BV1", [headers])
-        self.sheet.update("O2:BV101", duration_rows)
+        self.sheet.update("N2:N101", nickname_rows)
+        self.sheet.update("P1:BW1", [headers])
+        self.sheet.update("P2:BW101", duration_rows)
     
