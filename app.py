@@ -64,6 +64,10 @@ def main():
     parser_server_1 = Parser(os.getenv("S1_IP"), int(os.getenv("S1_PORT")), jedi_prefixes, ranks)
     parser_server_2 = Parser(os.getenv("S2_IP"), int(os.getenv("S2_PORT")), jedi_prefixes, ranks)
 
+    logger.info("Начинаю форматирование таблицы")
+    sheets_manager.update_table()
+    logger.info("Форматирование таблицы завершено")
+
     while True:
         wait_until_next_update()
         logger.info("Запущен плановый цикл обновления")
