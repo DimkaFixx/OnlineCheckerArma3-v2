@@ -33,8 +33,8 @@ class GoogleTableManager:
         self.sheet = self.spreadsheet.worksheet(self.list_name)
     
     def get_data_of_users(self): 
-        #Получить значения с диапазона ячеек 
-        return self.sheet.get_values('B1:B100')
+        # Получить ники текущих игроков.
+        return self.sheet.get_values('C1:C100')
     
     def update_table(self):
         temp_sheet = self.sheet
@@ -63,19 +63,19 @@ class GoogleTableManager:
         self.sheet = temp_sheet
     
     def get_ranks(self):
-        ranks = self.sheet.get_values('C1:C100')
+        ranks = self.sheet.get_values('D1:D100')
         for i in range(len(ranks)):
             ranks[i] = ranks[i][0]
         return ranks
     
     def get_jedi_prefixes(self):
-        jedi_prefixes = self.sheet.get_values('D1:D100')
+        jedi_prefixes = self.sheet.get_values('E1:E100')
         for i in range(len(jedi_prefixes)):
             jedi_prefixes[i] = jedi_prefixes[i][0]
         return jedi_prefixes
 
     def update_daily_data(self):
-        """Заполнить I2:K101 последним онлайном игроков из B1:B100."""
+        """Заполнить J2:L101 последним онлайном игроков из C1:C100."""
         users = self.get_data_of_users()
         nicks = [row[0].strip() for row in users if row and row[0].strip()]
         server1_data = check_last_online_of_the_players_s1(nicks)
@@ -100,10 +100,10 @@ class GoogleTableManager:
             for nickname in nicks[:100]
         ]
         rows.extend([["", "", ""]] * (100 - len(rows)))
-        self.sheet.update("I2:K101", rows)
+        self.sheet.update("J2:L101", rows)
 
     def update_mounthly_data(self):
-        """Заполнить 30-дневный отчёт в столбцах L:BT.
+        """Заполнить 30-дневный отчёт: ники в M, данные S1/S2 — с O.
 
         Для каждой даты создаётся пара столбцов: первый хранит онлайн S1,
         второй — онлайн S2.
@@ -122,15 +122,19 @@ class GoogleTableManager:
         for day in dates:
             headers.extend([day, day])
 
-        rows = []
+        nickname_rows = []
+        duration_rows = []
         for nickname in nicks:
-            row = [f"`{nickname}`"]
+            duration_row = []
             for day in dates:
-                row.append(format_duration(server1_data[day].get(nickname, 0)))
-                row.append(format_duration(server2_data[day].get(nickname, 0)))
-            rows.append(row)
+                duration_row.append(format_duration(server1_data[day].get(nickname, 0)))
+                duration_row.append(format_duration(server2_data[day].get(nickname, 0)))
+            nickname_rows.append([f"`{nickname}`"])
+            duration_rows.append(duration_row)
 
-        rows.extend([[""] * 61] * (100 - len(rows)))
-        self.sheet.update("M1:BT1", [headers])
-        self.sheet.update("L2:BT101", rows)
+        nickname_rows.extend([[""]] * (100 - len(nickname_rows)))
+        duration_rows.extend([[""] * 60] * (100 - len(duration_rows)))
+        self.sheet.update("M2:M101", nickname_rows)
+        self.sheet.update("O1:BV1", [headers])
+        self.sheet.update("O2:BV101", duration_rows)
     
