@@ -41,7 +41,7 @@ class Parser:
     def get_data(self, host, port):
         working_address_and_port, server_info = self.find_working_query_address(host, port)
 
-        return a2s.players(working_address_and_port)
+        return a2s.players(working_address_and_port, timeout=30)
 
     def parse_players(self):
         data = self.get_data(self.host, self.port)
