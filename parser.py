@@ -1,14 +1,6 @@
 import a2s
-import logging
 import socket
 import re
-import time
-
-
-logger = logging.getLogger(__name__)
-PLAYER_QUERY_RETRY_WINDOW_SECONDS = 120
-PLAYER_QUERY_TIMEOUT_SECONDS = 10
-PLAYER_QUERY_RETRY_DELAY_SECONDS = 3
 
 class Player:
     def __init__(self, player_full_nick, duration):
@@ -27,7 +19,7 @@ class Parser:
         self.jedi_prefixes = jedi_prefixes
         self.ranks = ranks
     
-    def find_working_query_address(self, base_host, base_port, timeout=5):
+    def find_working_query_address(self, base_host, base_port):
         # Для ряда игр query-порт может отличаться от игрового на +/-1
         candidates = [(base_host, base_port), (base_host, base_port + 1), (base_host, base_port - 1)]
         checked = []
@@ -37,7 +29,7 @@ class Parser:
                 continue
             checked.append(candidate)
             try:
-                info = a2s.info(candidate, timeout=timeout)
+                info = a2s.info(candidate)
                 return candidate, info
             except (socket.timeout, TimeoutError):
                 continue
@@ -47,53 +39,9 @@ class Parser:
         return None, None
 
     def get_data(self, host, port):
-        """Запрашивать список игроков не дольше двух минут."""
+        working_address_and_port, server_info = self.find_working_query_address(host, port)
 
-        deadline = time.monotonic() + PLAYER_QUERY_RETRY_WINDOW_SECONDS
-        attempt = 0
-        last_error = None
-
-        while time.monotonic() < deadline:
-            attempt += 1
-            remaining_seconds = deadline - time.monotonic()
-            info_timeout = min(5, max(1, remaining_seconds))
-            working_address_and_port, _ = self.find_working_query_address(
-                host, port, timeout=info_timeout
-            )
-
-            if working_address_and_port is None:
-                last_error = TimeoutError("Query-порт игрового сервера не отвечает")
-            else:
-                try:
-                    player_timeout = min(
-                        PLAYER_QUERY_TIMEOUT_SECONDS,
-                        max(1, deadline - time.monotonic()),
-                    )
-                    return a2s.players(
-                        working_address_and_port, timeout=player_timeout
-                    )
-                except (socket.timeout, TimeoutError, OSError) as error:
-                    last_error = error
-
-            remaining_seconds = deadline - time.monotonic()
-            if remaining_seconds <= 0:
-                break
-
-            delay = min(PLAYER_QUERY_RETRY_DELAY_SECONDS, remaining_seconds)
-            logger.warning(
-                "Не удалось получить список игроков %s:%s, попытка %s. "
-                "Повтор через %.0f сек.",
-                host,
-                port,
-                attempt,
-                delay,
-            )
-            time.sleep(delay)
-
-        raise TimeoutError(
-            f"Сервер {host}:{port} не ответил на запрос игроков за "
-            f"{PLAYER_QUERY_RETRY_WINDOW_SECONDS} секунд"
-        ) from last_error
+        return a2s.players(working_address_and_port, timeout=100)
 
     def parse_players(self):
         data = self.get_data(self.host, self.port)
@@ -186,3 +134,6 @@ class Parser:
 
         # ФИ джедая, тут всё идет в тарары
         return player_nickname
+
+parser = Parser(host="195.18.27.19", port=2302, jedi_prefixes=["Jedi", "Jedi Master", "Jedi Knight"], ranks=["Private", "Corporal", "Sergeant", "Lieutenant", "Captain", "Major", "Colonel"])
+print(parser.parse_players())
