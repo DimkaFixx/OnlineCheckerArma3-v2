@@ -20,7 +20,7 @@ class Parser:
         self.ranks = ranks
 
     def get_data(self):
-        print(f"Attempting to retrieve player data from server... {a2s.info((self.host, self.port))}")
+        print(f"Attempting to retrieve player data from server... {a2s.info((self.host, self.port), timeout=100)}")
         return a2s.players((self.host, self.port), timeout=100)
 
     def parse_players(self):
