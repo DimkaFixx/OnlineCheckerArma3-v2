@@ -19,12 +19,12 @@ class Parser:
         self.jedi_prefixes = jedi_prefixes
         self.ranks = ranks
 
-    def get_data(self, host, port):
-
+    def get_data(self):
+        print(f"Attempting to retrieve player data from server... {a2s.info((self.host, self.port))}")
         return a2s.players((self.host, self.port), timeout=100)
 
     def parse_players(self):
-        data = self.get_data(self.host, self.port)
+        data = self.get_data()
 
         players = []
         for player in data:
