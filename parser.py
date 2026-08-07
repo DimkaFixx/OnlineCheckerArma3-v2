@@ -18,30 +18,10 @@ class Parser:
         self.port = port
         self.jedi_prefixes = jedi_prefixes
         self.ranks = ranks
-    
-    def find_working_query_address(self, base_host, base_port):
-        # Для ряда игр query-порт может отличаться от игрового на +/-1
-        candidates = [(base_host, base_port), (base_host, base_port + 1), (base_host, base_port - 1)]
-        checked = []
-
-        for candidate in candidates:
-            if candidate in checked:
-                continue
-            checked.append(candidate)
-            try:
-                info = a2s.info(candidate)
-                return candidate, info
-            except (socket.timeout, TimeoutError):
-                continue
-            except OSError:
-                continue
-
-        return None, None
 
     def get_data(self, host, port):
-        working_address_and_port, server_info = self.find_working_query_address(host, port)
 
-        return a2s.players(working_address_and_port, timeout=100)
+        return a2s.players((self.host, self.port), timeout=100)
 
     def parse_players(self):
         data = self.get_data(self.host, self.port)
