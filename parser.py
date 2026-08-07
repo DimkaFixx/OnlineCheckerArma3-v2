@@ -134,6 +134,3 @@ class Parser:
 
         # ФИ джедая, тут всё идет в тарары
         return player_nickname
-
-parser = Parser(host="195.18.27.19", port=2302, jedi_prefixes=["Jedi", "Jedi Master", "Jedi Knight"], ranks=["Private", "Corporal", "Sergeant", "Lieutenant", "Captain", "Major", "Colonel"])
-print(parser.parse_players())
