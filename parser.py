@@ -64,7 +64,14 @@ class Parser:
 
             return bat, self.format_player_nickname_not_with_bat(player_nickname)
 
-        # Убираем спецуху, только у джедаев там батальон
+        if player_nickname.startswith("[RC") and "|" in player_nickname:
+            squad = player_nickname.split("|")[-1].replace(" ", "") if "|" in player_nickname else None
+            if squad == "Acklay":
+                player_nickname = player_nickname.split("|")[0] if "|" in player_nickname else player_nickname
+                player_nickname = re.sub(r'\s*\[.*?\]\s*', '', player_nickname)
+                return "327", self.format_player_nickname_not_with_bat(player_nickname)
+
+        # Убираем спецуху, только у джедаев там батальон (ну и Acklay)
         player_nickname = player_nickname.split("|")[0] if "|" in player_nickname else player_nickname
         
         
