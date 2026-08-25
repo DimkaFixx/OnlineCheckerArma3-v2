@@ -38,7 +38,7 @@ class GoogleTableManager:
     
     def update_table(self):
         temp_sheet = self.sheet
-        self.sheet = self.spreadsheet.worksheet("Бойцы")
+        self.sheet = self.spreadsheet.worksheet("Состав")
         rows_count = self.sheet.row_count
         cols_count = self.sheet.col_count
         sort_range = f'{os.getenv("ROWSTOSORT_FROM")}3:{os.getenv("ROWSTOSORT_TO")}{rows_count}'
