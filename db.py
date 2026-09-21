@@ -29,6 +29,7 @@ def create_bat_table(table_name: str):
             "__tablename__": table_name,
             "id": Column(Integer, primary_key=True),
             "nick": Column(String),
+            "full_nick": Column(String, nullable=True),
             "bat": Column(String),
             "date": Column(String),
             # Суммарный онлайн игрока за дату из поля date.
@@ -46,7 +47,7 @@ s2_327 = create_bat_table("s2_327")
 
 
 def create_tables() -> None:
-    """Создать таблицы и добавить last_seen_at в уже существующие таблицы."""
+    """Создать таблицы и добавить full_nick в уже существующие таблицы."""
 
     Base.metadata.create_all(engine)
     inspector = inspect(engine)
@@ -54,9 +55,9 @@ def create_tables() -> None:
     with engine.begin() as connection:
         for table_name in ("s1_327", "s2_327"):
             columns = {column["name"] for column in inspector.get_columns(table_name)}
-            if "last_seen_at" not in columns:
+            if "full_nick" not in columns:
                 connection.execute(
-                    text(f"ALTER TABLE {table_name} ADD COLUMN last_seen_at VARCHAR")
+                    text(f"ALTER TABLE {table_name} ADD COLUMN full_nick VARCHAR(255)")
                 )
 
 
