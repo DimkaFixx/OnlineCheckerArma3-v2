@@ -133,7 +133,7 @@ def _update_bat_table(players, table) -> int:
                 continue
 
             nickname = player.name.strip()
-            full_nick = player.full_name.strip() if player.full_name else None
+            full_nick = player.player_full_nick.strip() if player.player_full_nick else None
             
             if not nickname or nickname in processed_nicknames:
                 continue
