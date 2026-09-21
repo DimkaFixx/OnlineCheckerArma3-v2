@@ -91,6 +91,7 @@ def _add_online_interval(
     session: Session,
     table,
     nickname: str,
+    full_nick: str,
     session_start: datetime,
     interval_start: datetime,
     interval_end: datetime,
@@ -111,6 +112,7 @@ def _add_online_interval(
             record.bat = "327"
             record.last_session_start_time = session_start.isoformat(timespec="seconds")
             record.last_seen_at = segment_end.isoformat(timespec="seconds")
+            record.full_nick = full_nick
 
         cursor = segment_end
 
@@ -126,10 +128,13 @@ def _update_bat_table(players, table) -> int:
 
     with Session(engine) as session:
         for player in players:
+            
             if str(player.bat).strip() != "327" or not player.name:
                 continue
 
             nickname = player.name.strip()
+            full_nick = player.full_name.strip() if player.full_name else None
+            
             if not nickname or nickname in processed_nicknames:
                 continue
             processed_nicknames.add(nickname)
@@ -162,6 +167,7 @@ def _update_bat_table(players, table) -> int:
                     session,
                     table,
                     nickname,
+                    full_nick,
                     session_start,
                     interval_start,
                     current_time,
